@@ -17,6 +17,8 @@ function Player:init(x, y)
     self:addState("roll", 34, 45, {tickStep = 2, nextAnimation = "idle"})
     self.rollACFrame = 44
     self:addState("slide", 46, 46)
+    self:addState("slideAttack", 47, 55, {tickStep = 2, nextAnimation = "idle"})
+    self.slideAttackACFrame = 54
 
     self.maxSpeed = 3
     self.velocity = 0
@@ -24,6 +26,7 @@ function Player:init(x, y)
     self.acceleration = 0.3
     self.friction = 0.3
     self.rollVelocity = 4
+    self.slideAttackVelocity = 4
     self:playAnimation()
     self:setCenter(0.5, 1.0)
     self:moveTo(x, y)
@@ -40,14 +43,18 @@ function Player:update()
             self:changeState("run")
         elseif pd.buttonIsPressed(pd.kButtonA) then
             self:changeState("attack1")
-        elseif pd.buttonIsPressed(pd.kButtonB) then
+        elseif pd.buttonJustPressed(pd.kButtonB) then
             self:changeState("roll")
+        elseif pd.buttonJustPressed(pd.kButtonDown) then
+            self:changeState("slideAttack")
         end
     elseif self.currentState == "run" then
         if pd.buttonIsPressed(pd.kButtonA) then
             self:changeState("attack1")
         elseif pd.buttonJustPressed(pd.kButtonB) then
             self:changeState("roll")
+        elseif pd.buttonIsPressed(pd.kButtonDown) then
+            self:changeState("slideAttack")
         elseif pd.buttonIsPressed(pd.kButtonLeft) then
             if self.velocity > 0 then
                 self.velocity = 0
@@ -70,17 +77,33 @@ function Player:update()
     elseif self.currentState == "attack1" then
         self:applyFriction()
         if self:getCurrentFrameIndex() >= self.attack1ACFrame then
+            if pd.buttonIsPressed(pd.kButtonLeft) then
+                self.globalFlip = 1
+            elseif pd.buttonIsPressed(pd.kButtonRight) then
+                self.globalFlip = 0
+            end
             if pd.buttonIsPressed(pd.kButtonA) then
                 self:changeState("attack2")
             elseif pd.buttonIsPressed(pd.kButtonB) then
                 self:changeState("roll")
+            elseif pd.buttonIsPressed(pd.kButtonDown) then
+                self:changeState("slideAttack")
             end
         end
     elseif self.currentState == "attack2" then
         self:applyFriction()
         if self:getCurrentFrameIndex() >= self.attack2ACFrame then
-            if pd.buttonIsPressed(pd.kButtonB) then
+            if pd.buttonIsPressed(pd.kButtonLeft) then
+                self.globalFlip = 1
+            elseif pd.buttonIsPressed(pd.kButtonRight) then
+                self.globalFlip = 0
+            end
+            if pd.buttonIsPressed(pd.kButtonA) then
+                self:changeState("attack1")
+            elseif pd.buttonIsPressed(pd.kButtonB) then
                 self:changeState("roll")
+            elseif pd.buttonIsPressed(pd.kButtonDown) then
+                self:changeState("slideAttack")
             end
         end
     elseif self.currentState == "roll" then
@@ -100,6 +123,14 @@ function Player:update()
             self:changeState("idle")
         elseif pd.buttonJustPressed(pd.kButtonB) then
             self:changeState("roll")
+        elseif pd.buttonIsPressed(pd.kButtonDown) then
+            self:changeState("slideAttack")
+        end
+    elseif self.currentState == "slideAttack" then
+        if self.globalFlip == 1 then
+            self.velocity = -self.slideAttackVelocity
+        else
+            self.velocity = self.slideAttackVelocity
         end
     end
 
