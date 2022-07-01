@@ -25,6 +25,7 @@ function Player:init(x, y)
     self.friction = 0.3
     self.rollVelocity = 4
     self:playAnimation()
+    self:setCenter(0.5, 1.0)
     self:moveTo(x, y)
 end
 
@@ -37,13 +38,13 @@ function Player:update()
         elseif pd.buttonIsPressed(pd.kButtonRight) then
             self.velocity = self.startVelocity
             self:changeState("run")
-        elseif pd.buttonJustPressed(pd.kButtonA) then
+        elseif pd.buttonIsPressed(pd.kButtonA) then
             self:changeState("attack1")
-        elseif pd.buttonJustPressed(pd.kButtonB) then
+        elseif pd.buttonIsPressed(pd.kButtonB) then
             self:changeState("roll")
         end
     elseif self.currentState == "run" then
-        if pd.buttonJustPressed(pd.kButtonA) then
+        if pd.buttonIsPressed(pd.kButtonA) then
             self:changeState("attack1")
         elseif pd.buttonJustPressed(pd.kButtonB) then
             self:changeState("roll")
@@ -69,16 +70,16 @@ function Player:update()
     elseif self.currentState == "attack1" then
         self:applyFriction()
         if self:getCurrentFrameIndex() >= self.attack1ACFrame then
-            if pd.buttonJustPressed(pd.kButtonA) then
+            if pd.buttonIsPressed(pd.kButtonA) then
                 self:changeState("attack2")
-            elseif pd.buttonJustPressed(pd.kButtonB) then
+            elseif pd.buttonIsPressed(pd.kButtonB) then
                 self:changeState("roll")
             end
         end
     elseif self.currentState == "attack2" then
         self:applyFriction()
         if self:getCurrentFrameIndex() >= self.attack2ACFrame then
-            if pd.buttonJustPressed(pd.kButtonB) then
+            if pd.buttonIsPressed(pd.kButtonB) then
                 self:changeState("roll")
             end
         end
@@ -103,6 +104,7 @@ function Player:update()
     end
 
     self:moveBy(self.velocity, 0)
+    gfx.setDrawOffset(-self.x + 200, 0)
 
     if self.velocity < 0 then
         self.globalFlip = 1
