@@ -5,18 +5,24 @@ import "CoreLibs/sprites"
 import "CoreLibs/timer"
 
 import "scripts/game/player/player"
+import "scripts/game/parallax"
 
 local pd <const> = playdate
 local gfx <const> = pd.graphics
 
 local function initialize()
     gfx.setBackgroundColor(gfx.kColorBlack)
-    Player(200, 176)
+    local player = Player(200, 176)
     local groundImage = gfx.image.new("images/background/background")
     local groundSprite = gfx.sprite.new(groundImage)
     groundSprite:setZIndex(-200)
     groundSprite:moveTo(200, 120)
     groundSprite:add()
+
+    local darkColumns = gfx.image.new("images/background/ditheredColumn2")
+    Parallax(player, 100, 12, darkColumns)
+    local darkestColumns = gfx.image.new("images/background/ditheredColumn1")
+    Parallax(player, 80, 6, darkestColumns)
     -- local backgroundImage = gfx.image.new("images/background")
     -- gfx.sprite.setBackgroundDrawingCallback(
     --     function(x, y, width, height)

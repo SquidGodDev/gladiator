@@ -95,32 +95,28 @@ function Player:update()
     elseif self.currentState == "attack1" then
         self:applyFriction()
         if self:getCurrentFrameIndex() >= self.attack1ACFrame then
-            if pd.buttonIsPressed(pd.kButtonLeft) then
-                self.globalFlip = 1
-            elseif pd.buttonIsPressed(pd.kButtonRight) then
-                self.globalFlip = 0
-            end
             if pd.buttonIsPressed(pd.kButtonA) then
+                self:switchPlayerDirection()
                 self:changeState("attack2")
             elseif pd.buttonIsPressed(pd.kButtonB) then
+                self:switchPlayerDirection()
                 self:changeState("roll")
             elseif pd.buttonIsPressed(pd.kButtonDown) then
+                self:switchPlayerDirection()
                 self:changeState("slideAttack")
             end
         end
     elseif self.currentState == "attack2" then
         self:applyFriction()
         if self:getCurrentFrameIndex() >= self.attack2ACFrame then
-            if pd.buttonIsPressed(pd.kButtonLeft) then
-                self.globalFlip = 1
-            elseif pd.buttonIsPressed(pd.kButtonRight) then
-                self.globalFlip = 0
-            end
             if pd.buttonIsPressed(pd.kButtonA) then
+                self:switchPlayerDirection()
                 self:changeState("attack1")
             elseif pd.buttonIsPressed(pd.kButtonB) then
+                self:switchPlayerDirection()
                 self:changeState("roll")
             elseif pd.buttonIsPressed(pd.kButtonDown) then
+                self:switchPlayerDirection()
                 self:changeState("slideAttack")
             end
         end
@@ -182,5 +178,13 @@ function Player:applyFriction()
 
     if math.abs(self.velocity) < 0.5 then
         self.velocity = 0
+    end
+end
+
+function Player:switchPlayerDirection()
+    if pd.buttonIsPressed(pd.kButtonLeft) then
+        self.globalFlip = 1
+    elseif pd.buttonIsPressed(pd.kButtonRight) then
+        self.globalFlip = 0
     end
 end
