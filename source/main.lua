@@ -11,8 +11,8 @@ local gfx <const> = pd.graphics
 
 local function initialize()
     gfx.setBackgroundColor(gfx.kColorBlack)
-    Player(200, 160)
-    local groundImage = gfx.image.new("images/background/ground")
+    Player(200, 176)
+    local groundImage = gfx.image.new("images/background/background")
     local groundSprite = gfx.sprite.new(groundImage)
     groundSprite:setZIndex(-200)
     groundSprite:moveTo(200, 120)
