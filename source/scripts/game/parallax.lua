@@ -3,12 +3,12 @@ local gfx <const> = pd.graphics
 
 class("Parallax").extends(gfx.sprite)
 
-function Parallax:init(player, height, rate, image)
+function Parallax:init(player, offset, height, rate, image)
     Parallax.super.init(self)
     self.rate = rate
     self.player = player
     self:setImage(image)
-    self:moveTo(200, height)
+    self:moveTo(200 + offset, height)
     self:add()
     self:setZIndex(math.floor(-10000 / rate))
 end
