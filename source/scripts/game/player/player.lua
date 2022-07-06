@@ -1,4 +1,5 @@
 import "scripts/libraries/AnimatedSprite"
+import "scripts/game/player/playerHitbox"
 
 local pd <const> = playdate
 local gfx <const> = pd.graphics
@@ -29,12 +30,18 @@ function Player:init(x, y)
 
     local slideAttackEndFrame = 55
     self:addState("slideAttack", 47, slideAttackEndFrame, {tickStep = 2, nextAnimation = "idle"})
-    self.slideAttackACFrame = slideAttackEndFrame -1
+    self.slideAttackACFrame = slideAttackEndFrame - 1
 
     self.idleCollisionRect = pd.geometry.rect.new(45, 10, 21, 38)
     self.runCollisionRect = pd.geometry.rect.new(45, 10, 21, 38)
     self.rollCollisionRect = pd.geometry.rect.new(45, 10, 21, 38)
     self.slideAttackCollisionRect = pd.geometry.rect.new(37, 31, 38, 17)
+    self:setGroups(PLAYER_GROUP)
+    self.collisionResponse = gfx.sprite.kCollisionTypeOverlap
+
+    self.attack1Damage = 5
+    self.attack2Damage = 7
+    self.slideAttackDamage = 3
 
     self.maxSpeed = 3
     self.velocity = 0
@@ -59,20 +66,20 @@ function Player:update()
             self.velocity = self.startVelocity
             self:changeState("run")
         elseif pd.buttonIsPressed(pd.kButtonA) then
-            self:changeState("attack1")
+            self:switchToAttack1()
         elseif pd.buttonJustPressed(pd.kButtonB) then
             self:changeState("roll")
         elseif pd.buttonJustPressed(pd.kButtonDown) then
-            self:changeState("slideAttack")
+            self:switchToSlideAttack()
         end
     elseif self.currentState == "run" then
         self:setCollideRect(self.runCollisionRect)
         if pd.buttonIsPressed(pd.kButtonA) then
-            self:changeState("attack1")
+            self:switchToAttack1()
         elseif pd.buttonJustPressed(pd.kButtonB) then
             self:changeState("roll")
         elseif pd.buttonIsPressed(pd.kButtonDown) then
-            self:changeState("slideAttack")
+            self:switchToSlideAttack()
         elseif pd.buttonIsPressed(pd.kButtonLeft) then
             if self.velocity > 0 then
                 self.velocity = 0
@@ -97,13 +104,13 @@ function Player:update()
         if self:getCurrentFrameIndex() >= self.attack1ACFrame then
             if pd.buttonIsPressed(pd.kButtonA) then
                 self:switchPlayerDirection()
-                self:changeState("attack2")
+                self:switchToAttack2()
             elseif pd.buttonIsPressed(pd.kButtonB) then
                 self:switchPlayerDirection()
                 self:changeState("roll")
             elseif pd.buttonIsPressed(pd.kButtonDown) then
                 self:switchPlayerDirection()
-                self:changeState("slideAttack")
+                self:switchToSlideAttack()
             end
         end
     elseif self.currentState == "attack2" then
@@ -111,13 +118,13 @@ function Player:update()
         if self:getCurrentFrameIndex() >= self.attack2ACFrame then
             if pd.buttonIsPressed(pd.kButtonA) then
                 self:switchPlayerDirection()
-                self:changeState("attack1")
+                self:switchToAttack1()
             elseif pd.buttonIsPressed(pd.kButtonB) then
                 self:switchPlayerDirection()
                 self:changeState("roll")
             elseif pd.buttonIsPressed(pd.kButtonDown) then
                 self:switchPlayerDirection()
-                self:changeState("slideAttack")
+                self:switchToSlideAttack()
             end
         end
     elseif self.currentState == "roll" then
@@ -141,13 +148,13 @@ function Player:update()
         if pd.buttonJustPressed(pd.kButtonLeft) or pd.buttonJustPressed(pd.kButtonRight) then
             self:changeState("run")
         elseif pd.buttonJustPressed(pd.kButtonA) then
-            self:changeState("attack1")
+            self:switchToAttack1()
         elseif math.abs(self.velocity) < 1 then
             self:changeState("idle")
         elseif pd.buttonJustPressed(pd.kButtonB) then
             self:changeState("roll")
         elseif pd.buttonIsPressed(pd.kButtonDown) then
-            self:changeState("slideAttack")
+            self:switchToSlideAttack()
         end
     elseif self.currentState == "slideAttack" then
         self:setCollideRect(self.slideAttackCollisionRect)
@@ -187,4 +194,49 @@ function Player:switchPlayerDirection()
     elseif pd.buttonIsPressed(pd.kButtonRight) then
         self.globalFlip = 0
     end
+end
+
+function Player:switchToAttack1()
+    self:changeState("attack1")
+    self:createAttack1Hitbox()
+end
+
+function Player:switchToAttack2()
+    self:changeState("attack2")
+    self:createAttack2Hitbox()
+end
+
+function Player:switchToSlideAttack()
+    self:changeState("slideAttack")
+    self:createSlideAttackHitbox()
+end
+
+function Player:createAttack1Hitbox()
+    local xOffset, yOffset = 20, -40
+    local width, height = 40, 50
+    local delay, time = 4, 6
+    if self.globalFlip == 1 then
+        xOffset = -xOffset - width
+    end
+    PlayerHitbox(self, xOffset, yOffset, width, height, delay, time, self.attack1Damage)
+end
+
+function Player:createAttack2Hitbox()
+    local xOffset, yOffset = 5, -40
+    local width, height = 40, 50
+    local delay, time = 4, 6
+    if self.globalFlip == 1 then
+        xOffset = -xOffset - width
+    end
+    PlayerHitbox(self, xOffset, yOffset, width, height, delay, time, self.attack2Damage)
+end
+
+function Player:createSlideAttackHitbox()
+    local xOffset, yOffset = -20, -20
+    local width, height = 45, 20
+    local delay, time = 1, 15
+    if self.globalFlip == 1 then
+        xOffset = -xOffset - width
+    end
+    PlayerHitbox(self, xOffset, yOffset, width, height, delay, time, self.attack2Damage)
 end

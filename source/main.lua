@@ -3,9 +3,13 @@ import "CoreLibs/object"
 import "CoreLibs/graphics"
 import "CoreLibs/sprites"
 import "CoreLibs/timer"
+import "CoreLibs/frameTimer"
 
 import "scripts/game/player/player"
 import "scripts/game/parallax"
+
+PLAYER_GROUP = 1
+ENEMY_GROUP = 2
 
 local pd <const> = playdate
 local gfx <const> = pd.graphics
@@ -44,5 +48,6 @@ initialize()
 function pd.update()
     gfx.sprite.update()
     pd.timer.updateTimers()
+    pd.frameTimer.updateTimers()
     playdate.drawFPS(10, 10)
 end
