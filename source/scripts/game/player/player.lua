@@ -1,12 +1,16 @@
 import "scripts/libraries/AnimatedSprite"
 import "scripts/game/player/playerHitbox"
+import "scripts/game/player/healthbar"
 
 local pd <const> = playdate
 local gfx <const> = pd.graphics
 
 class('Player').extends(AnimatedSprite)
 
-function Player:init(x, y)
+function Player:init(x)
+    self.health = 100
+    self.healthbar = Healthbar(self.health)
+
     local playerSpriteSheet = gfx.imagetable.new("images/player/player-table-112-48")
     Player.super.init(self, playerSpriteSheet)
     self:addState("idle", 1, 10, {tickStep = 4})
@@ -52,7 +56,12 @@ function Player:init(x, y)
     self.slideAttackVelocity = 4
     self:playAnimation()
     self:setCenter(0.5, 1.0)
-    self:moveTo(x, y)
+    self:moveTo(x, GROUND_LEVEL)
+end
+
+function Player:damage(amount)
+    self.health -= amount
+    self.healthbar:updateHealthbar(self.health)
 end
 
 function Player:update()
@@ -174,6 +183,8 @@ function Player:update()
         self.globalFlip = 0
     end
     self:updateAnimation()
+
+    PLAYER_X = self.x
 end
 
 function Player:applyFriction()
@@ -212,8 +223,8 @@ function Player:switchToSlideAttack()
 end
 
 function Player:createAttack1Hitbox()
-    local xOffset, yOffset = 20, -40
-    local width, height = 40, 50
+    local xOffset, yOffset = 10, -40
+    local width, height = 50, 50
     local delay, time = 4, 6
     if self.globalFlip == 1 then
         xOffset = -xOffset - width
@@ -222,8 +233,8 @@ function Player:createAttack1Hitbox()
 end
 
 function Player:createAttack2Hitbox()
-    local xOffset, yOffset = 5, -40
-    local width, height = 40, 50
+    local xOffset, yOffset = 0, -40
+    local width, height = 50, 50
     local delay, time = 4, 6
     if self.globalFlip == 1 then
         xOffset = -xOffset - width
