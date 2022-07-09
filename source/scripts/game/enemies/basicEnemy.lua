@@ -11,7 +11,7 @@ function BasicEnemy:init(x, spritesheet)
     -- self:addState("idle", 1, 10, {tickStep = 4})
     -- self:addState("run", 11, 20, {tickStep = 4})
     -- self:addState("attack", 21, 22, {tickStep = 3, nextAnimation = "idle"})
-    -- self:addState("hit", 21, 22, {tickStep = 3, nextAnimation = "idle"})
+    -- self:addState("hit", 21, 22)
     -- self:addState("death", 21, 22, {tickStep = 3})
 
     -- self.idleCollisionRect = pd.geometry.rect.new(45, 10, 21, 38)
@@ -30,6 +30,9 @@ function BasicEnemy:init(x, spritesheet)
     -- self.detectRange = 30
     -- self.attackRange = 10
     -- self.attackCooldown = 500
+
+    -- self.hitStunTime = 500
+    -- self.hitVelocity = 2
 
     -- self:playAnimation()
 
@@ -50,7 +53,9 @@ function BasicEnemy:init(x, spritesheet)
 end
 
 function Enemy:update()
-    if not self.playerInRange and (math.abs(PLAYER_X - self.x) <= self.detectRange) then
+    if self.died then
+        -- Nothing
+    elseif not self.playerInRange and (math.abs(PLAYER_X - self.x) <= self.detectRange) then
         self.playerInRange = true
         self.paceTimer:remove()
         self:changeState("run")
@@ -108,6 +113,53 @@ function Enemy:update()
         self.globalFlip = 0
     end
     self:updateAnimation()
+end
+
+function BasicEnemy:damage(amount)
+    if self.attackHitbox then
+        self.attackHitbox:cancel()
+        self.attackHitbox = nil
+    end
+    if self.died then
+        if self.currentState ~= "death" then
+            self:changeState("death")
+        end
+        return
+    end
+    BasicEnemy.super.damage(self, amount)
+    if self.health <= 0 then
+        self.died = true
+        if self.attackCooldownTimer then
+            self.attackCooldownTimer:remove()
+        end
+        if self.stunTimer then
+            self.stunTimer:remove()
+        end
+        self.paceTimer:remove()
+        self:changeState("death")
+        return
+    end
+    if self.stunTimer then
+        self.stunTimer:remove()
+    end
+    self.paceTimer:remove()
+    self.stunTimer = pd.timer.new(self.hitStunTime, function()
+        self.stunTimer = nil
+        self:resetPaceTimer()
+        if self.attackCooldownTimer then
+            self.attackCooldownTimer:remove()
+        end
+        self.attackCooldownTimer = pd.timer.new(self.attackCooldown * 0.2, function()
+            self.attackCooldownTimer = nil
+        end)
+        self:changeState("idle")
+    end)
+    if PLAYER_X < self.x then
+        self.velocity = self.hitVelocity
+    else
+        self.velocity = -self.hitVelocity
+    end
+    self:changeState("hit")
 end
 
 function BasicEnemy:applyFriction()

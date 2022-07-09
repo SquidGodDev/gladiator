@@ -13,7 +13,9 @@ function Hitbox:init(entity, xOffset, yOffset, w, h, delay, time, damage)
     self:setCollideRect(0, 0, w, h)
     self.collisionResponse = gfx.sprite.kCollisionTypeOverlap
 
-    pd.frameTimer.new(delay, function()
+    self.collisionDict = {}
+
+    self.delayTimer = pd.frameTimer.new(delay, function()
         self:add()
         pd.frameTimer.new(time, function()
             self:remove()
@@ -24,4 +26,18 @@ end
 function Hitbox:update()
     self:moveTo(self.entity.x + self.xOffset, self.entity.y + self.yOffset)
     local collisions = self:overlappingSprites()
+    if #collisions > 0 then
+        for i, collisionSprite in ipairs(collisions) do
+            local collisionID = collisionSprite._sprite
+            if not self.collisionDict[collisionID] then
+                self.collisionDict[collisionID] = true
+                collisionSprite:damage(self.damage)
+            end
+        end
+    end
+end
+
+function Hitbox:cancel()
+    self.delayTimer:remove()
+    self:remove()
 end

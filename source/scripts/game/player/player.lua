@@ -223,8 +223,8 @@ function Player:switchToSlideAttack()
 end
 
 function Player:createAttack1Hitbox()
-    local xOffset, yOffset = 10, -40
-    local width, height = 50, 50
+    local xOffset, yOffset = 0, -40
+    local width, height = 60, 50
     local delay, time = 4, 6
     if self.globalFlip == 1 then
         xOffset = -xOffset - width
@@ -233,8 +233,8 @@ function Player:createAttack1Hitbox()
 end
 
 function Player:createAttack2Hitbox()
-    local xOffset, yOffset = 0, -40
-    local width, height = 50, 50
+    local xOffset, yOffset = -30, -40
+    local width, height = 80, 50
     local delay, time = 4, 6
     if self.globalFlip == 1 then
         xOffset = -xOffset - width
