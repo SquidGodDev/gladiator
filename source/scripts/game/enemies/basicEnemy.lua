@@ -53,11 +53,15 @@ function BasicEnemy:init(x, spritesheet)
 end
 
 function Enemy:update()
-    if self.died then
+    if self.currentState == "death" then
+        self:applyFriction()
+        self:updateAnimation()
+        return
+    elseif self.died then
         return
     end
 
-    if self.currentState ~= "death" then
+    if not self.died then
         if not self.playerInRange and (math.abs(PLAYER_X - self.x) <= self.detectRange) then
             self.playerInRange = true
             self.paceTimer:remove()
@@ -72,14 +76,14 @@ function Enemy:update()
     if self.currentState == "idle" then
         self:setCollideRect(self.idleCollisionRect)
         self:applyFriction()
-        if self.playerInRange then
+        if self.playerInRange and not self.died then
             if not self.attackCooldownTimer then
                 self:changeState("run")
             end
         end
     elseif self.currentState == "run" then
         self:setCollideRect(self.runCollisionRect)
-        if self.playerInRange then
+        if self.playerInRange and not self.died then
             self.movingRight = self.x <= PLAYER_X
             if math.abs(PLAYER_X - self.x) <= self.attackRange then
                 self:changeState("attack")
@@ -124,11 +128,12 @@ function BasicEnemy:damage(amount)
         self.attackHitbox:cancel()
         self.attackHitbox = nil
     end
-    if self.currentState == "death" or self.died then
+    if self.died then
         return
     end
     BasicEnemy.super.damage(self, amount)
     if self.health <= 0 then
+        self.died = true
         if self.attackCooldownTimer then
             self.attackCooldownTimer:remove()
             self.attackCooldownTimer = nil
@@ -179,13 +184,15 @@ end
 function BasicEnemy:resetPaceTimer()
     local randomPaceTime = math.random(math.floor(self.paceTime * 0.8), math.floor(self.paceTime * 1.2))
     self.paceTimer = pd.timer.new(randomPaceTime, function()
-        if self.currentState == "idle" then
-            self.movingRight = not self.movingRight
-            self:changeState("run")
-            self:resetPaceTimer()
-        else
-            self:changeState("idle")
-            self:resetPaceTimer()
+        if not self.died then
+            if self.currentState == "idle" then
+                self.movingRight = not self.movingRight
+                self:changeState("run")
+                self:resetPaceTimer()
+            else
+                self:changeState("idle")
+                self:resetPaceTimer()
+            end
         end
     end)
 end
