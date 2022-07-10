@@ -54,15 +54,19 @@ end
 
 function Enemy:update()
     if self.died then
-        -- Nothing
-    elseif not self.playerInRange and (math.abs(PLAYER_X - self.x) <= self.detectRange) then
-        self.playerInRange = true
-        self.paceTimer:remove()
-        self:changeState("run")
-    elseif self.playerInRange and (math.abs(PLAYER_X - self.x) >= self.detectRange) then
-        self.playerInRange = false
-        self:resetPaceTimer()
-        self:changeState("idle")
+        return
+    end
+
+    if self.currentState ~= "death" then
+        if not self.playerInRange and (math.abs(PLAYER_X - self.x) <= self.detectRange) then
+            self.playerInRange = true
+            self.paceTimer:remove()
+            self:changeState("run")
+        elseif self.playerInRange and (math.abs(PLAYER_X - self.x) >= self.detectRange) then
+            self.playerInRange = false
+            self:resetPaceTimer()
+            self:changeState("idle")
+        end
     end
 
     if self.currentState == "idle" then
@@ -120,20 +124,18 @@ function BasicEnemy:damage(amount)
         self.attackHitbox:cancel()
         self.attackHitbox = nil
     end
-    if self.died then
-        if self.currentState ~= "death" then
-            self:changeState("death")
-        end
+    if self.currentState == "death" or self.died then
         return
     end
     BasicEnemy.super.damage(self, amount)
     if self.health <= 0 then
-        self.died = true
         if self.attackCooldownTimer then
             self.attackCooldownTimer:remove()
+            self.attackCooldownTimer = nil
         end
         if self.stunTimer then
             self.stunTimer:remove()
+            self.stunTimer = nil
         end
         self.paceTimer:remove()
         self:changeState("death")

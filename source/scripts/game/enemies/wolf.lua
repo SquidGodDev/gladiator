@@ -21,6 +21,7 @@ function Wolf:init(x)
     self:addState("hit", 15, 15)
     self:addState("death", 15, 20, {tickStep = 5, loop = false})
     self.states["death"].onAnimationEndEvent = function()
+        self.died = true
         self.deathImage = self:getImage()
         local deathFadeTimer = pd.timer.new(1000, 1.0, 0.0)
         deathFadeTimer.updateCallback = function(timer)
