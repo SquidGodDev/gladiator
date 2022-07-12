@@ -56,6 +56,8 @@ function Wolf:init(x)
     self.hitStunTime = 500
     self.hitVelocity = 3
 
+    self.getsStunned = true
+
     self:playAnimation()
 end
 

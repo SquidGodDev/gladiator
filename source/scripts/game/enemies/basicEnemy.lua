@@ -124,11 +124,11 @@ function Enemy:update()
 end
 
 function BasicEnemy:damage(amount)
-    if self.attackHitbox then
-        self.attackHitbox:cancel()
-        self.attackHitbox = nil
-    end
     if self.died then
+        if self.attackHitbox then
+            self.attackHitbox:cancel()
+            self.attackHitbox = nil
+        end
         return
     end
     BasicEnemy.super.damage(self, amount)
@@ -146,27 +146,34 @@ function BasicEnemy:damage(amount)
         self:changeState("death")
         return
     end
-    if self.stunTimer then
-        self.stunTimer:remove()
-    end
-    self.paceTimer:remove()
-    self.stunTimer = pd.timer.new(self.hitStunTime, function()
-        self.stunTimer = nil
-        self:resetPaceTimer()
-        if self.attackCooldownTimer then
-            self.attackCooldownTimer:remove()
+
+    if self.getsStunned then
+        if self.stunTimer then
+            self.stunTimer:remove()
         end
-        self.attackCooldownTimer = pd.timer.new(self.attackCooldown * 0.2, function()
-            self.attackCooldownTimer = nil
+        self.paceTimer:remove()
+        self.stunTimer = pd.timer.new(self.hitStunTime, function()
+            self.stunTimer = nil
+            self:resetPaceTimer()
+            if self.attackCooldownTimer then
+                self.attackCooldownTimer:remove()
+            end
+            self.attackCooldownTimer = pd.timer.new(self.attackCooldown * 0.2, function()
+                self.attackCooldownTimer = nil
+            end)
+            self:changeState("idle")
         end)
-        self:changeState("idle")
-    end)
-    if PLAYER_X < self.x then
-        self.velocity = self.hitVelocity
-    else
-        self.velocity = -self.hitVelocity
+        if PLAYER_X < self.x then
+            self.velocity = self.hitVelocity
+        else
+            self.velocity = -self.hitVelocity
+        end
+        self:changeState("hit")
+        if self.attackHitbox then
+            self.attackHitbox:cancel()
+            self.attackHitbox = nil
+        end
     end
-    self:changeState("hit")
 end
 
 function BasicEnemy:applyFriction()
