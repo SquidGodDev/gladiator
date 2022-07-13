@@ -36,6 +36,19 @@ function Player:init(x)
     self:addState("slideAttack", 47, slideAttackEndFrame, {tickStep = 2, nextAnimation = "idle"})
     self.slideAttackACFrame = slideAttackEndFrame - 1
 
+    local spinAttackStartFrame = 56
+    local spinLeftSwingFrame = spinAttackStartFrame + 1
+    local spinRightSwingFrame = spinAttackStartFrame + 3
+    self:addState("spinAttack", spinAttackStartFrame, 60, {tickStep = 2})
+    self.states["spinAttack"].onFrameChangedEvent = function()
+        if self:getCurrentFrameIndex() == spinLeftSwingFrame then
+            self:createSpinAttackLeftHitbox()
+        elseif self:getCurrentFrameIndex() == spinRightSwingFrame then
+            self:createSpinAttackRightHitbox()
+        end
+    end
+    self.spinAttackThreshold = 10
+
     self.idleCollisionRect = pd.geometry.rect.new(45, 10, 21, 38)
     self.runCollisionRect = pd.geometry.rect.new(45, 10, 21, 38)
     self.rollCollisionRect = pd.geometry.rect.new(45, 10, 21, 38)
@@ -46,6 +59,7 @@ function Player:init(x)
     self.attack1Damage = 5
     self.attack2Damage = 7
     self.slideAttackDamage = 3
+    self.spinAttackDamage = 3
 
     self.maxSpeed = 3
     self.velocity = 0
@@ -80,6 +94,8 @@ function Player:update()
             self:changeState("roll")
         elseif pd.buttonJustPressed(pd.kButtonDown) then
             self:switchToSlideAttack()
+        elseif self:crankIsSpun() then
+            self:changeState("spinAttack")
         end
     elseif self.currentState == "run" then
         self:setCollideRect(self.runCollisionRect)
@@ -87,6 +103,8 @@ function Player:update()
             self:switchToAttack1()
         elseif pd.buttonJustPressed(pd.kButtonB) then
             self:changeState("roll")
+        elseif self:crankIsSpun() then
+            self:changeState("spinAttack")
         elseif pd.buttonIsPressed(pd.kButtonDown) then
             self:switchToSlideAttack()
         elseif pd.buttonIsPressed(pd.kButtonLeft) then
@@ -172,6 +190,32 @@ function Player:update()
         else
             self.velocity = self.slideAttackVelocity
         end
+    elseif self.currentState == "spinAttack" then
+        self:setCollideRect(self.idleCollisionRect)
+        if pd.buttonIsPressed(pd.kButtonLeft) then
+            if self.velocity > 0 then
+                self.velocity = 0
+            end
+            self.velocity -= self.acceleration
+            if self.velocity <= -self.maxSpeed then
+                self.velocity = -self.maxSpeed
+            end
+        elseif pd.buttonIsPressed(pd.kButtonRight) then
+            if self.velocity < 0 then
+                self.velocity = 0
+            end
+            self.velocity += self.acceleration
+            if self.velocity >= self.maxSpeed then
+                self.velocity = self.maxSpeed
+            end
+        else
+            self:applyFriction()
+        end
+
+        local crankChange, acceleratedCrankChange = pd.getCrankChange()
+        if acceleratedCrankChange == 0 then
+            self:changeState("idle")
+        end
     end
 
     self:moveBy(self.velocity, 0)
@@ -197,6 +241,14 @@ function Player:applyFriction()
     if math.abs(self.velocity) < 0.5 then
         self.velocity = 0
     end
+end
+
+function Player:crankIsSpun()
+    local crankChange, acceleratedCrankChange = pd.getCrankChange()
+    if math.abs(acceleratedCrankChange) >= self.spinAttackThreshold then
+        return true
+    end
+    return false
 end
 
 function Player:switchPlayerDirection()
@@ -250,4 +302,24 @@ function Player:createSlideAttackHitbox()
         xOffset = -xOffset - width
     end
     PlayerHitbox(self, xOffset, yOffset, width, height, delay, time, self.attack2Damage)
+end
+
+function Player:createSpinAttackRightHitbox()
+    local xOffset, yOffset = -30, -30
+    local width, height = 80, 30
+    local delay, time = 0, 2
+    if self.globalFlip == 1 then
+        xOffset = -xOffset - width
+    end
+    PlayerHitbox(self, xOffset, yOffset, width, height, delay, time, self.spinAttackDamage)
+end
+
+function Player:createSpinAttackLeftHitbox()
+    local xOffset, yOffset = -45, -30
+    local width, height = 80, 30
+    local delay, time = 0, 2
+    if self.globalFlip == 1 then
+        xOffset = -xOffset - width
+    end
+    PlayerHitbox(self, xOffset, yOffset, width, height, delay, time, self.spinAttackDamage)
 end
