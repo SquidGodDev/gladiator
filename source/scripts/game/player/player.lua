@@ -1,6 +1,7 @@
 import "scripts/libraries/AnimatedSprite"
 import "scripts/game/player/playerHitbox"
 import "scripts/game/player/healthbar"
+import "scripts/game/player/spinAttackMeter"
 
 local pd <const> = playdate
 local gfx <const> = pd.graphics
@@ -10,6 +11,7 @@ class('Player').extends(AnimatedSprite)
 function Player:init(x)
     self.health = 100
     self.healthbar = Healthbar(self.health)
+    self.spinAttackMeter = SpinAttackMeter(self)
 
     local playerSpriteSheet = gfx.imagetable.new("images/player/player-table-112-48")
     Player.super.init(self, playerSpriteSheet)
@@ -215,6 +217,8 @@ function Player:update()
         local crankChange, acceleratedCrankChange = pd.getCrankChange()
         if acceleratedCrankChange == 0 then
             self:changeState("idle")
+        elseif not self.spinAttackMeter:deplete() then
+            self:changeState("idle")
         end
     end
 
@@ -246,7 +250,7 @@ end
 function Player:crankIsSpun()
     local crankChange, acceleratedCrankChange = pd.getCrankChange()
     if math.abs(acceleratedCrankChange) >= self.spinAttackThreshold then
-        return true
+        return self.spinAttackMeter:deplete()
     end
     return false
 end
