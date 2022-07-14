@@ -282,9 +282,6 @@ function Player:createAttack1Hitbox()
     local xOffset, yOffset = 0, -40
     local width, height = 60, 50
     local delay, time = 4, 6
-    if self.globalFlip == 1 then
-        xOffset = -xOffset - width
-    end
     PlayerHitbox(self, xOffset, yOffset, width, height, delay, time, self.attack1Damage)
 end
 
@@ -292,9 +289,6 @@ function Player:createAttack2Hitbox()
     local xOffset, yOffset = -30, -40
     local width, height = 80, 50
     local delay, time = 4, 6
-    if self.globalFlip == 1 then
-        xOffset = -xOffset - width
-    end
     PlayerHitbox(self, xOffset, yOffset, width, height, delay, time, self.attack2Damage)
 end
 
@@ -302,9 +296,6 @@ function Player:createSlideAttackHitbox()
     local xOffset, yOffset = -20, -20
     local width, height = 45, 20
     local delay, time = 1, 15
-    if self.globalFlip == 1 then
-        xOffset = -xOffset - width
-    end
     PlayerHitbox(self, xOffset, yOffset, width, height, delay, time, self.attack2Damage)
 end
 
@@ -312,9 +303,6 @@ function Player:createSpinAttackRightHitbox()
     local xOffset, yOffset = -30, -30
     local width, height = 80, 30
     local delay, time = 0, 2
-    if self.globalFlip == 1 then
-        xOffset = -xOffset - width
-    end
     PlayerHitbox(self, xOffset, yOffset, width, height, delay, time, self.spinAttackDamage)
 end
 
@@ -322,8 +310,5 @@ function Player:createSpinAttackLeftHitbox()
     local xOffset, yOffset = -45, -30
     local width, height = 80, 30
     local delay, time = 0, 2
-    if self.globalFlip == 1 then
-        xOffset = -xOffset - width
-    end
     PlayerHitbox(self, xOffset, yOffset, width, height, delay, time, self.spinAttackDamage)
 end

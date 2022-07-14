@@ -34,6 +34,8 @@ function BasicEnemy:init(x, spritesheet)
     -- self.hitStunTime = 500
     -- self.hitVelocity = 2
 
+    -- self.getsStunned = true
+
     -- self:playAnimation()
 
     local isMovingRight = math.random(2)
@@ -56,8 +58,16 @@ function Enemy:update()
     if self.currentState == "death" then
         self:applyFriction()
         self:updateAnimation()
+        if self.attackHitbox then
+            self.attackHitbox:cancel()
+            self.attackHitbox = nil
+        end
         return
     elseif self.died then
+        if self.attackHitbox then
+            self.attackHitbox:cancel()
+            self.attackHitbox = nil
+        end
         return
     end
 
@@ -147,6 +157,14 @@ function BasicEnemy:damage(amount)
         return
     end
 
+    if self.hitVelocity ~= 0 then
+        if PLAYER_X < self.x then
+            self.velocity = self.hitVelocity
+        else
+            self.velocity = -self.hitVelocity
+        end
+    end
+
     if self.getsStunned then
         if self.stunTimer then
             self.stunTimer:remove()
@@ -163,11 +181,6 @@ function BasicEnemy:damage(amount)
             end)
             self:changeState("idle")
         end)
-        if PLAYER_X < self.x then
-            self.velocity = self.hitVelocity
-        else
-            self.velocity = -self.hitVelocity
-        end
         self:changeState("hit")
         if self.attackHitbox then
             self.attackHitbox:cancel()

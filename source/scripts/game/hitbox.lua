@@ -16,6 +16,9 @@ function Hitbox:init(entity, xOffset, yOffset, w, h, delay, time, damage)
     self.collisionDict = {}
 
     self.delayTimer = pd.frameTimer.new(delay, function()
+        if entity.globalFlip == 1 then
+            self.xOffset = -xOffset - w
+        end
         self:add()
         pd.frameTimer.new(time, function()
             self:remove()

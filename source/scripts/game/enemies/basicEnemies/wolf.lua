@@ -1,4 +1,4 @@
-import "scripts/game/enemies/basicEnemy"
+import "scripts/game/enemies/basicEnemies/basicEnemy"
 import "scripts/game/enemies/enemyHitbox"
 
 local pd <const> = playdate
@@ -65,8 +65,5 @@ function Wolf:createAttackHitbox()
     local xOffset, yOffset = 2, -22
     local width, height = 28, 18
     local delay, time = 4, 2
-    if self.globalFlip == 1 then
-        xOffset = -xOffset - width
-    end
     self.attackHitbox = EnemyHitbox(self, xOffset, yOffset, width, height, delay, time, self.attackDamage)
 end

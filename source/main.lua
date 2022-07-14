@@ -7,7 +7,11 @@ import "CoreLibs/frameTimer"
 
 import "scripts/game/player/player"
 import "scripts/game/parallax"
-import "scripts/game/enemies/wolf"
+import "scripts/game/enemies/basicEnemies/wolf"
+import "scripts/game/enemies/basicEnemies/rat"
+import "scripts/game/enemies/basicEnemies/ghost"
+import "scripts/game/enemies/basicEnemies/worm"
+import "scripts/game/enemies/basicEnemies/minotaur"
 
 PLAYER_GROUP = 1
 ENEMY_GROUP = 2
@@ -33,13 +37,16 @@ local function initialize()
     skySprite:setZIndex(-500)
     skySprite:moveTo(200, 120)
     skySprite:add()
-    Wolf(220)
-    Wolf(150)
-    Wolf(300)
-    Wolf(400)
-    Wolf(500)
-    Wolf(100)
-    Wolf(500)
+
+    Rat(300)
+    Minotaur(220)
+    Worm(500)
+    Ghost(400)
+    -- Minotaur(150)
+    -- Minotaur(300)
+    -- Minotaur(400)
+    -- Worm(100)
+    -- Worm(500)
 
     -- local darkColumns = gfx.image.new("images/background/ditheredColumn2")
     -- Parallax(player, 10, 120, 48, darkColumns)
