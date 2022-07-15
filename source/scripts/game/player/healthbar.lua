@@ -17,6 +17,7 @@ function Healthbar:init(maxHealth)
     self.barX = 25
     self.barY = 25
 
+    self:setZIndex(1000)
     self:setCenter(0.0, 0.5)
     self:moveTo(self.barX, self.barY)
     self:setIgnoresDrawOffset(true)
@@ -24,6 +25,7 @@ function Healthbar:init(maxHealth)
 
     local heartImage = gfx.image.new("images/UI/heart")
     local heartSprite = gfx.sprite.new(heartImage)
+    heartSprite:setZIndex(1001)
     heartSprite:setIgnoresDrawOffset(true)
     heartSprite:moveTo(self.barX, self.barY)
     heartSprite:add()

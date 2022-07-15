@@ -223,7 +223,18 @@ function Player:update()
     end
 
     self:moveBy(self.velocity, 0)
-    gfx.setDrawOffset(-self.x + 200, 0)
+    if self.x <= LEFT_WALL then
+        self:moveTo(LEFT_WALL, self.y)
+    elseif self.x >= RIGHT_WALL then
+        self:moveTo(RIGHT_WALL, self.y)
+    end
+    local drawOffsetX = -self.x + 200
+    if self.x <= LEFT_WALL + 200 then
+        drawOffsetX = -(LEFT_WALL + 200) + 200
+    elseif self.x >= RIGHT_WALL - 200 then
+        drawOffsetX = -(RIGHT_WALL - 200) + 200
+    end
+    gfx.setDrawOffset(drawOffsetX, 0)
 
     if self.velocity < 0 then
         self.globalFlip = 1

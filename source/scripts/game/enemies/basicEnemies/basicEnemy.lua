@@ -124,6 +124,11 @@ function Enemy:update()
     end
 
     self:moveBy(self.velocity, 0)
+    if self.x <= LEFT_WALL then
+        self:moveTo(LEFT_WALL, self.y)
+    elseif self.x >= RIGHT_WALL then
+        self:moveTo(RIGHT_WALL, self.y)
+    end
 
     if self.velocity < 0 then
         self.globalFlip = 1
@@ -142,7 +147,8 @@ function BasicEnemy:damage(amount)
         return
     end
     BasicEnemy.super.damage(self, amount)
-    if self.health <= 0 then
+    if self.health <= 0 and not self.died then
+        SignalController:notify("enemy_died")
         self.died = true
         if self.attackCooldownTimer then
             self.attackCooldownTimer:remove()
