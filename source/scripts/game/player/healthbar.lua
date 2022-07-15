@@ -8,11 +8,6 @@ function Healthbar:init(maxHealth)
     self.barWidth = 150
     self.barHeight = 20
     self.barCornerRadius = 10
-    local healthbarImage = gfx.image.new(self.barWidth, self.barHeight)
-    gfx.pushContext(healthbarImage)
-        gfx.fillRoundRect(0, 0, self.barWidth, self.barHeight, self.barCornerRadius)
-    gfx.popContext()
-    self:setImage(healthbarImage)
 
     self.barX = 25
     self.barY = 25

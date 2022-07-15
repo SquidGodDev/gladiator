@@ -16,6 +16,7 @@ function WaveController:init()
         self.enemiesKilled += 1
         if self.enemiesKilled >= self.totalEnemies then
             self.wave += 1
+            CUR_WAVE = self.wave
             self.enemiesKilled = 0
             self.spawnedEnemies = 0
             self.totalEnemies = self.totalEnemiesBase + self.wave * self.totalEnemiesBase
@@ -29,6 +30,7 @@ function WaveController:init()
     self.enemiesKilled = 0
     self.spawnedEnemies = 0
     self.wave = 1
+    CUR_WAVE = 1
     self.maxEnemies = 3
     self.totalEnemiesBase = 3
     self.waveMultiplier = 3

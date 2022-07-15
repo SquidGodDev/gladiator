@@ -38,3 +38,7 @@ function Signal:notify(key, ...)
 		end
 	end
 end
+
+function Signal:clear()
+	self.listeners = {}
+end
