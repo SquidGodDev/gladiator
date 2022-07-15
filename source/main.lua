@@ -19,6 +19,11 @@ ENEMY_GROUP = 2
 MAX_WAVE = 0
 CUR_WAVE = 1
 
+local gameData = pd.datastore.read()
+if gameData then
+    MAX_WAVE = gameData.maxWave
+end
+
 GROUND_LEVEL = 176
 LEFT_WALL = -528
 RIGHT_WALL = 528
@@ -36,4 +41,16 @@ function pd.update()
     pd.frameTimer.updateTimers()
     SceneManager:update()
     -- playdate.drawFPS(10, 10)
+end
+
+function pd.gameWillTerminate()
+    pd.datastore.write({
+        maxWave = MAX_WAVE
+    })
+end
+
+function pd.gameWillSleep()
+    pd.datastore.write({
+        maxWave = MAX_WAVE
+    })
 end
