@@ -44,6 +44,7 @@ function SceneManager:update()
         gfx.popContext()
         self.transitionSprite:setImage(transitionImage)
 
+        self.transitionAnimator:ended()
         if self.transitioningIn and self.transitionAnimator:ended() then
             self:loadNewScene()
         elseif self.transitionAnimator:ended() then
