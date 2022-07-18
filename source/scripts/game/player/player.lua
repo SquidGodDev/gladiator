@@ -211,6 +211,12 @@ function Player:update()
         end
     elseif self.currentState == "spinAttack" then
         self:setCollideRect(self.idleCollisionRect)
+        local crankChange, acceleratedCrankChange = pd.getCrankChange()
+        if acceleratedCrankChange < 0 then
+            self.globalFlip = 1
+        elseif acceleratedCrankChange > 0 then
+            self.globalFlip = 0
+        end
         if pd.buttonIsPressed(pd.kButtonLeft) then
             if self.velocity > 0 then
                 self.velocity = 0
@@ -253,10 +259,12 @@ function Player:update()
     end
     gfx.setDrawOffset(drawOffsetX, 0)
 
-    if self.velocity < 0 then
-        self.globalFlip = 1
-    elseif self.velocity > 0 then
-        self.globalFlip = 0
+    if self.currentState ~= "spinAttack" then
+        if self.velocity < 0 then
+            self.globalFlip = 1
+        elseif self.velocity > 0 then
+            self.globalFlip = 0
+        end
     end
     self:updateAnimation()
 

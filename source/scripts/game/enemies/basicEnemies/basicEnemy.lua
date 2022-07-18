@@ -6,38 +6,6 @@ local gfx <const> = pd.graphics
 class('BasicEnemy').extends(Enemy)
 
 function BasicEnemy:init(x, spritesheet)
-    -- self.health = 100
-
-    -- self:addState("idle", 1, 10, {tickStep = 4})
-    -- self:addState("run", 11, 20, {tickStep = 4})
-    -- self:addState("attack", 21, 22, {tickStep = 3, nextAnimation = "idle"})
-    -- self:addState("hit", 21, 22)
-    -- self:addState("death", 21, 22, {tickStep = 3})
-
-    -- self.idleCollisionRect = pd.geometry.rect.new(45, 10, 21, 38)
-    -- self.runCollisionRect = pd.geometry.rect.new(45, 10, 21, 38)
-    -- self.attackCollisionRect = pd.geometry.rect.new(45, 10, 21, 38)
-
-    -- self.attackDamage = 5
-
-    -- self.maxSpeed = 3
-    -- self.startVelocity = 2
-    -- self.acceleration = 0.3
-    -- self.friction = 0.3
-
-    -- self.paceTime = 1000
-
-    -- self.detectRange = 30
-    -- self.attackRange = 10
-    -- self.attackCooldown = 500
-
-    -- self.hitStunTime = 500
-    -- self.hitVelocity = 2
-
-    -- self.getsStunned = true
-
-    -- self:playAnimation()
-
     local isMovingRight = math.random(2)
     if isMovingRight == 1 then
         self.movingRight = true

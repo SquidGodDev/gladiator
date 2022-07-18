@@ -1,3 +1,5 @@
+-- Written by Dustin Mierau: https://devforum.play.date/t/a-list-of-helpful-libraries-and-code/221/3
+
 class("Signal").extends()
 
 function Signal:init()
