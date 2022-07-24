@@ -2,14 +2,15 @@ import "scripts/libraries/AnimatedSprite"
 import "scripts/game/player/playerHitbox"
 import "scripts/game/player/healthbar"
 import "scripts/game/player/spinAttackMeter"
-import "scripts/game/results/resultsScene"
+import "scripts/map/mapScene"
 
 local pd <const> = playdate
 local gfx <const> = pd.graphics
 
 class('Player').extends(AnimatedSprite)
 
-function Player:init(x)
+function Player:init(x, waveController)
+    self.waveController = waveController
     self.maxHealth = 100
     self.health = 100
     self.healthbar = Healthbar(self.maxHealth)
@@ -56,7 +57,8 @@ function Player:init(x)
 
     self:addState("death", 61, 70, {tickStep = 4, loop = false})
     self.states["death"].onAnimationEndEvent = function()
-        SceneManager:switchScene(ResultsScene)
+        self.waveController:stopSpawning()
+        SceneManager:switchScene(MapScene)
     end
 
     self.idleCollisionRect = pd.geometry.rect.new(45, 10, 21, 38)

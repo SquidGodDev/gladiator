@@ -4,11 +4,16 @@ import "CoreLibs/graphics"
 import "CoreLibs/sprites"
 import "CoreLibs/timer"
 import "CoreLibs/frameTimer"
+import "CoreLibs/nineslice"
+import "CoreLibs/ui"
+import "CoreLibs/crank"
 
 import "scripts/libraries/Signal"
 import "scripts/sceneManager"
 
 import "scripts/game/gameScene"
+import "scripts/map/mapScene"
+import "scripts/map/shop/shopScene"
 
 local pd <const> = playdate
 local gfx <const> = pd.graphics
@@ -18,6 +23,8 @@ ENEMY_GROUP = 2
 
 MAX_WAVE = 0
 CUR_WAVE = 1
+
+CUR_LEVEL = 1
 
 local gameData = pd.datastore.read()
 if gameData then
@@ -33,7 +40,9 @@ PLAYER_X = 0
 SceneManager = SceneManager()
 SignalController = Signal()
 
-GameScene()
+-- GameScene()
+MapScene()
+-- ShopScene()
 
 function pd.update()
     gfx.sprite.update()

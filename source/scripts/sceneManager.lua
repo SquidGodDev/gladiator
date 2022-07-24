@@ -10,7 +10,7 @@ function SceneManager:init()
     self.transitioningIn = false
 end
 
-function SceneManager:switchScene(scene)
+function SceneManager:switchScene(scene, ...)
     if self.transitioningIn then
         return
     end
@@ -18,6 +18,7 @@ function SceneManager:switchScene(scene)
     self.transitioningIn = true
 
     self.newScene = scene
+    self.sceneArgs = ...
     self:createTransitionSprite(false)
 end
 
@@ -28,7 +29,7 @@ function SceneManager:loadNewScene()
     self:createTransitionSprite(true)
     self.transitionAnimator = gfx.animator.new(self.transitionTime, self.transitionWidth, 0, pd.easingFunctions.inOutCubic)
     self.transitioningIn = false
-    self.newScene()
+    self.newScene(self.sceneArgs)
 end
 
 function SceneManager:update()

@@ -6,9 +6,10 @@ local gfx <const> = playdate.graphics
 
 class('GameScene').extends()
 
-function GameScene:init()
+function GameScene:init(enemyList)
     math.randomseed(playdate.getSecondsSinceEpoch())
-    local player = Player(PLAYER_X)
+    local waveController = WaveController(enemyList)
+    local player = Player(PLAYER_X, waveController)
     local groundImage = gfx.image.new("images/background/background")
     local groundSprite = gfx.sprite.new(groundImage)
     groundSprite:setZIndex(-200)
@@ -20,6 +21,4 @@ function GameScene:init()
     skySprite:setZIndex(-500)
     skySprite:moveTo(200, 120)
     skySprite:add()
-
-    WaveController()
 end

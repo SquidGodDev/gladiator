@@ -4,25 +4,31 @@ import "scripts/game/enemies/basicEnemies/ghost"
 import "scripts/game/enemies/basicEnemies/worm"
 import "scripts/game/enemies/basicEnemies/minotaur"
 import "scripts/game/level/spawnEffect"
+import "scripts/map/mapScene"
 
 local pd <const> = playdate
 local gfx <const> = pd.graphics
 
 class('WaveController').extends(gfx.sprite)
 
-function WaveController:init()
+function WaveController:init(enemyList)
     SignalController:subscribe("enemy_died", self, function()
         self.currentEnemies -= 1
         self.enemiesKilled += 1
         if self.enemiesKilled >= self.totalEnemies then
             self.wave += 1
-            CUR_WAVE = self.wave
             self.enemiesKilled = 0
             self.spawnedEnemies = 0
             self.totalEnemies = self.totalEnemiesBase + self.wave * self.totalEnemiesBase
+
+            if self.wave >= 3 then
+                CUR_LEVEL += 1
+                self:stopSpawning()
+                SceneManager:switchScene(MapScene)
+            end
         end
     end)
-    self.enemyTypes = {Wolf, Rat, Ghost, Worm, Minotaur}
+    self.enemyTypes = enemyList
     self.spawnMin = LEFT_WALL + 10
     self.spawnMax = RIGHT_WALL - 10
 
@@ -30,7 +36,6 @@ function WaveController:init()
     self.enemiesKilled = 0
     self.spawnedEnemies = 0
     self.wave = 1
-    CUR_WAVE = 1
     self.maxEnemies = 3
     self.totalEnemiesBase = 3
     self.waveMultiplier = 3
@@ -80,4 +85,8 @@ function WaveController:update()
         gfx.drawText(waveText, 0, 0)
     gfx.popContext()
     self.waveTextSprite:setImage(waveTextImage)
+end
+
+function WaveController:stopSpawning()
+    self.spawnTimer:remove()
 end
