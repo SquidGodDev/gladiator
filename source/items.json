@@ -1,0 +1,40 @@
+{
+    "spinningTop" : {
+        "name" : "Spinning Top",
+        "description" : "Increases spin attack duration",
+        "cost" : 100,
+        "imagePath" : "spinningTop"
+    },
+    "jarOfGrease" : {
+        "name" : "Jar of Grease",
+        "description" : "Enables you to slide attack indefinetly",
+        "cost" : 200,
+        "imagePath" : "jarOfGrease"
+    },
+    "pocketBomb" : {
+        "name" : "Pocket Bomb",
+        "description" : "Rolling leaves a bomb that explodes and deals damage to nearby enemies",
+        "cost" : 50,
+        "imagePath" : "bomb"
+    },
+    "lightningStone" : {
+        "name" : "Lightning Stone",
+        "description" : "[Swap Ability] Activating makes your next basic attack a dash attack",
+        "cost" : 50,
+        "imagePath" : "lightningStone",
+        "cooldown" : 50
+    },
+    "bulwark" : {
+        "name" : "Bulwark",
+        "description" : "[Swap Ability] Activating makes the next attack you receive deal no damage",
+        "cost" : 50,
+        "imagePath" : "bulwark",
+        "cooldown" : 100
+    },
+    "thiefsDagger" : {
+        "name" : "Thief's Dagger",
+        "description" : "Backstabs do 50% more damage",
+        "cost" : 100,
+        "imagePath" : "thiefsDagger"
+    }
+}

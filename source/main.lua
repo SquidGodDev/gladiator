@@ -7,6 +7,7 @@ import "CoreLibs/frameTimer"
 import "CoreLibs/nineslice"
 import "CoreLibs/ui"
 import "CoreLibs/crank"
+import "CoreLibs/animation"
 
 import "scripts/libraries/Signal"
 import "scripts/sceneManager"
@@ -24,7 +25,10 @@ ENEMY_GROUP = 2
 MAX_WAVE = 0
 CUR_WAVE = 1
 
-CUR_LEVEL = 1
+CUR_LEVEL = 3
+GOLD = 100
+
+PURCHASED_ITEMS = {}
 
 local gameData = pd.datastore.read()
 if gameData then

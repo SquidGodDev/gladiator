@@ -111,15 +111,15 @@ function MapScene:init()
         local iconX = (index - 1) * (self.mapIconWidth * 2) + self.mapPadding
         if #levelOptions == 1 then
             local iconY = 120
-            local curMapSprite = self:createMapSprite(iconX, iconY, levelOptions[1].type)
+            local curMapSprite = self:createMapSprite(iconX, iconY, levelOptions[1].type, index)
             if CUR_LEVEL == index then
                 table.insert(self.curLevelSprites, curMapSprite)
             end
         else
             local iconY = 120 - self.mapYOffset
-            local firstMapSprite = self:createMapSprite(iconX, iconY, levelOptions[1].type)
+            local firstMapSprite = self:createMapSprite(iconX, iconY, levelOptions[1].type, index)
             iconY = 120 + self.mapYOffset
-            local secondMapSprite = self:createMapSprite(iconX, iconY, levelOptions[2].type)
+            local secondMapSprite = self:createMapSprite(iconX, iconY, levelOptions[2].type, index)
             if CUR_LEVEL == index then
                 table.insert(self.curLevelSprites, firstMapSprite)
                 table.insert(self.curLevelSprites, secondMapSprite)
@@ -173,6 +173,12 @@ function MapScene:init()
     mapBorderSprite:moveTo(-borderOffset, -borderOffset)
     mapBorderSprite:add()
 
+    local levelSelectBorderImage = gfx.image.new("images/map/selectedLevelBorder")
+    self.levelSelectBorderSprite = gfx.sprite.new(levelSelectBorderImage)
+    self.levelSelectBorderSprite:add()
+    local curSelectedSprite = self:getSelectedSprite()
+    self.levelSelectBorderSprite:moveTo(curSelectedSprite.x, curSelectedSprite.y)
+
     self:add()
 end
 
@@ -216,7 +222,7 @@ function MapScene:update()
     end
 end
 
-function MapScene:createMapSprite(x, y, type)
+function MapScene:createMapSprite(x, y, type, levelIndex)
     local iconImage
     if type == "enemy" then
         iconImage = self.skullImage
@@ -226,6 +232,13 @@ function MapScene:createMapSprite(x, y, type)
         iconImage = self.shopImage
     end
     local mapSprite = gfx.sprite.new(iconImage)
+    if levelIndex > CUR_LEVEL then
+        local ditheredIcon = gfx.image.new(iconImage:getSize())
+        gfx.pushContext(ditheredIcon)
+            iconImage:drawFaded(0, 0, 0.7, gfx.image.kDitherTypeBayer8x8)
+        gfx.popContext()
+        mapSprite:setImage(ditheredIcon)
+    end
     mapSprite:moveTo(x, y)
     mapSprite:add()
     return mapSprite
@@ -245,6 +258,7 @@ function MapScene:animatedSelectedSprite()
     self.selectAnimator = pd.timer.new(2000, 0, 2 * 3.14)
     self.selectAnimator.repeats = true
     local selectedSprite = self:getSelectedSprite()
+    self.levelSelectBorderSprite:moveTo(selectedSprite.x, selectedSprite.y)
     self.selectAnimator.updateCallback = function(timer)
         local baseY = 120
         if self:isDoubleChoice() then
@@ -254,7 +268,7 @@ function MapScene:animatedSelectedSprite()
                 baseY = 120 + self.mapYOffset
             end
         end
-        selectedSprite:moveTo(selectedSprite.x, math.sin(timer.value) * 10 + baseY)
+        selectedSprite:moveTo(selectedSprite.x, math.sin(timer.value) * 5 + baseY)
     end
 end
 
