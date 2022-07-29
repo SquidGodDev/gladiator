@@ -103,10 +103,8 @@ function Player:damage(amount)
 end
 
 function Player:update()
-    if pd.buttonIsPressed(pd.kButtonUp) then
-        self.swapPopup:setVisible(true)
-    else
-        self.swapPopup:setVisible(false)
+    if pd.buttonJustPressed(pd.kButtonUp) then
+        self.swapPopup:setVisible(not self.swapPopup:isVisible())
     end
     if self.currentState == "idle" then
         self:setCollideRect(self.idleCollisionRect)
@@ -247,7 +245,7 @@ function Player:update()
             self:applyFriction()
         end
 
-        if pd.buttonIsPressed(pd.kButtonUp) then
+        if self.swapPopup:isVisible() then
             self:changeState("idle")
         elseif acceleratedCrankChange == 0 then
             self:changeState("idle")
@@ -316,7 +314,7 @@ function Player:applyFriction()
 end
 
 function Player:crankIsSpun()
-    if pd.buttonIsPressed(pd.kButtonUp) then
+    if self.swapPopup:isVisible() then
         return false
     end
     local crankChange, acceleratedCrankChange = pd.getCrankChange()

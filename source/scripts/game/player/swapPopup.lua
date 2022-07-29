@@ -44,16 +44,19 @@ function SwapPopup:init()
     self:setZIndex(500)
     self:moveTo(350, 80)
     self:setIgnoresDrawOffset(true)
+    self:setVisible(false)
 
     self:add()
 end
 
 function SwapPopup:update()
-    local crankTicks = pd.getCrankTicks(6)
-    if crankTicks == 1 then
-        self.swapGrid:selectNextRow(true)
-    elseif crankTicks == -1 then
-        self.swapGrid:selectPreviousRow(true)
+    if self:isVisible() then
+        local crankTicks = pd.getCrankTicks(4)
+        if crankTicks == 1 then
+            self.swapGrid:selectNextRow(true)
+        elseif crankTicks == -1 then
+            self.swapGrid:selectPreviousRow(true)
+        end
     end
 
     if self.swapGrid.needsDisplay then
