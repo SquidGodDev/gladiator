@@ -7,8 +7,9 @@
     },
     "jarOfGrease" : {
         "name" : "Jar of Grease",
-        "description" : "Enables you to slide attack indefinetly",
-        "cost" : 200,
+        "description" : "[Swap Ability] Activating performs a slide attack",
+        "cost" : 100,
+        "swap" : true,
         "imagePath" : "jarOfGrease"
     },
     "pocketBomb" : {
@@ -22,6 +23,7 @@
         "description" : "[Swap Ability] Activating makes your next basic attack a dash attack",
         "cost" : 50,
         "imagePath" : "lightningStone",
+        "swap" : true,
         "cooldown" : 50
     },
     "bulwark" : {
@@ -29,6 +31,7 @@
         "description" : "[Swap Ability] Activating makes the next attack you receive deal no damage",
         "cost" : 50,
         "imagePath" : "bulwark",
+        "swap" : true,
         "cooldown" : 100
     },
     "thiefsDagger" : {

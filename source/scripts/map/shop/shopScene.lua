@@ -3,39 +3,13 @@ import "scripts/map/mapScene"
 local pd <const> = playdate
 local gfx <const> = playdate.graphics
 
--- local shopItems = {
---     {
---         name = "Bomb",
---         path = "bomb"
---     },
---     {
---         name = "Bow and Arrow",
---         path = "bow"
---     },
---     {
---         name = "Crown",
---         path = "crown"
---     },
---     {
---         name = "Potion",
---         path = "potion"
---     },
---     {
---         name = "Queen of Hearts",
---         path = "queenOfHearts"
---     },
---     {
---         name = "Wooden Shield",
---         path = "woodenShield"
---     }
--- }
-
 local availableItems = json.decodeFile("items.json")
 local shopItems
 
 class('ShopScene').extends(gfx.sprite)
 
 function ShopScene:init()
+    self.shopItemKeys = {}
     self:generateShopItems()
 
     self.cellWidth = 42
@@ -121,6 +95,7 @@ function ShopScene:update()
                 GOLD -= selectedItem.cost
                 selectedItem.purchased = true
                 self.gridRedraw = true
+                PURCHASED_ITEMS[self.shopItemKeys[column]] = selectedItem
                 self:updateGoldDisplay()
                 self:updateItemDisplay()
             else
@@ -182,6 +157,7 @@ function ShopScene:generateShopItems()
     for itemKey, value in pairs(availableItems) do
         if not PURCHASED_ITEMS[itemKey] then
             table.insert(shopItems, value)
+            table.insert(self.shopItemKeys, itemKey)
         end
     end
 end

@@ -49,6 +49,11 @@ function MapScene:init()
         },
         {
             {
+                type = "shop"
+            }
+        },
+        {
+            {
                 type = "enemy",
                 enemies = {
                     Worm,

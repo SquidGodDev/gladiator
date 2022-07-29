@@ -2,6 +2,7 @@ import "scripts/libraries/AnimatedSprite"
 import "scripts/game/player/playerHitbox"
 import "scripts/game/player/healthbar"
 import "scripts/game/player/spinAttackMeter"
+import "scripts/game/player/swapPopup"
 import "scripts/map/mapScene"
 
 local pd <const> = playdate
@@ -16,6 +17,8 @@ function Player:init(x, waveController)
     self.healthbar = Healthbar(self.maxHealth)
     self.healthbar:updateHealthbar(self.health)
     self.spinAttackMeter = SpinAttackMeter(self)
+
+    self.swapPopup = SwapPopup()
 
     local playerSpriteSheet = gfx.imagetable.new("images/player/player-table-112-48")
     Player.super.init(self, playerSpriteSheet)
@@ -100,6 +103,11 @@ function Player:damage(amount)
 end
 
 function Player:update()
+    if pd.buttonIsPressed(pd.kButtonUp) then
+        self.swapPopup:setVisible(true)
+    else
+        self.swapPopup:setVisible(false)
+    end
     if self.currentState == "idle" then
         self:setCollideRect(self.idleCollisionRect)
         self:applyFriction()
@@ -114,7 +122,7 @@ function Player:update()
         elseif pd.buttonJustPressed(pd.kButtonB) then
             self:changeState("roll")
         elseif pd.buttonJustPressed(pd.kButtonDown) then
-            self:switchToSlideAttack()
+            self:activateSwapAbility()
         elseif self:crankIsSpun() then
             self:changeState("spinAttack")
         end
@@ -127,7 +135,7 @@ function Player:update()
         elseif self:crankIsSpun() then
             self:changeState("spinAttack")
         elseif pd.buttonIsPressed(pd.kButtonDown) then
-            self:switchToSlideAttack()
+            self:activateSwapAbility()
         elseif pd.buttonIsPressed(pd.kButtonLeft) then
             if self.velocity > 0 then
                 self.velocity = 0
@@ -158,7 +166,7 @@ function Player:update()
                 self:changeState("roll")
             elseif pd.buttonIsPressed(pd.kButtonDown) then
                 self:switchPlayerDirection()
-                self:switchToSlideAttack()
+                self:activateSwapAbility()
             end
         end
     elseif self.currentState == "attack2" then
@@ -172,7 +180,7 @@ function Player:update()
                 self:changeState("roll")
             elseif pd.buttonIsPressed(pd.kButtonDown) then
                 self:switchPlayerDirection()
-                self:switchToSlideAttack()
+                self:activateSwapAbility()
             end
         end
     elseif self.currentState == "roll" then
@@ -202,7 +210,7 @@ function Player:update()
         elseif pd.buttonJustPressed(pd.kButtonB) then
             self:changeState("roll")
         elseif pd.buttonIsPressed(pd.kButtonDown) then
-            self:switchToSlideAttack()
+            self:activateSwapAbility()
         end
     elseif self.currentState == "slideAttack" then
         self:setCollideRect(self.slideAttackCollisionRect)
@@ -239,8 +247,9 @@ function Player:update()
             self:applyFriction()
         end
 
-        local crankChange, acceleratedCrankChange = pd.getCrankChange()
-        if acceleratedCrankChange == 0 then
+        if pd.buttonIsPressed(pd.kButtonUp) then
+            self:changeState("idle")
+        elseif acceleratedCrankChange == 0 then
             self:changeState("idle")
         elseif not self.spinAttackMeter:deplete() then
             self:changeState("idle")
@@ -273,6 +282,27 @@ function Player:update()
     PLAYER_X = self.x
 end
 
+function Player:activateSwapAbility()
+    local curAbility = self.swapPopup:getSelectedItem()
+    if not curAbility then
+        return
+    end
+
+    local abilityName = curAbility.name
+    if abilityName == "Jar of Grease" then
+        self:switchToSlideAttack()
+    elseif abilityName == "Lightning Stone" then
+        if self.globalFlip == 1 then
+            self.velocity = -10
+        else
+            self.velocity = 10
+        end
+        self:switchToAttack1()
+    elseif abilityName == "Bulwark" then
+
+    end
+end
+
 function Player:applyFriction()
     if self.velocity > 0 then
         self.velocity -= self.friction
@@ -286,6 +316,9 @@ function Player:applyFriction()
 end
 
 function Player:crankIsSpun()
+    if pd.buttonIsPressed(pd.kButtonUp) then
+        return false
+    end
     local crankChange, acceleratedCrankChange = pd.getCrankChange()
     if math.abs(acceleratedCrankChange) >= self.spinAttackThreshold then
         return self.spinAttackMeter:deplete()
