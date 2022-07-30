@@ -35,6 +35,7 @@ function Hitbox:update()
             if not self.collisionDict[collisionID] then
                 self.collisionDict[collisionID] = true
                 collisionSprite:damage(self.damage)
+                self:signalDamage()
             end
         end
     end
@@ -43,4 +44,8 @@ end
 function Hitbox:cancel()
     self.delayTimer:remove()
     self:remove()
+end
+
+function Hitbox:signalDamage()
+    -- Overriden in playerHitbox.lua
 end

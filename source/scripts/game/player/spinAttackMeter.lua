@@ -3,8 +3,8 @@ local gfx <const> = pd.graphics
 
 class('SpinAttackMeter').extends(gfx.sprite)
 
-function SpinAttackMeter:init(player)
-    self.meterMax = 100
+function SpinAttackMeter:init(player, meterMax)
+    self.meterMax = meterMax
     self.meterValue = self.meterMax
     self.spinAvailable = true
     self.player = player
@@ -20,7 +20,7 @@ end
 function SpinAttackMeter:deplete()
     if not self.spinAvailable then
         return false
-    elseif self.meterValue == 0 then
+    elseif self.meterValue <= 0 then
         self.spinAvailable = false
         return false
     end
@@ -28,16 +28,24 @@ function SpinAttackMeter:deplete()
     return true
 end
 
+function SpinAttackMeter:recharge(amount)
+    self.meterValue += amount
+    if self.meterValue >= self.meterMax then
+        self.meterValue = self.meterMax
+        self.spinAvailable = true
+    end
+end
+
 function SpinAttackMeter:update()
     self:moveTo(self.player.x, self.player.y - 50)
-    if not self.spinAvailable then
-        self.meterValue += 1
-        if self.meterValue == self.meterMax then
-            self.spinAvailable = true
-        end
-    end
+    -- if not self.spinAvailable then
+    --     self.meterValue += 1
+    --     if self.meterValue >= self.meterMax then
+    --         self.spinAvailable = true
+    --     end
+    -- end
 
-    self:setVisible(self.meterValue ~= self.meterMax)
+    self:setVisible(self.meterValue < self.meterMax and self.meterValue > 0)
     local meterImage = gfx.image.new(self.meterWidth, self.meterHeight)
     gfx.pushContext(meterImage)
         gfx.setColor(gfx.kColorWhite)

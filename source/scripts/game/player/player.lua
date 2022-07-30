@@ -16,7 +16,11 @@ function Player:init(x, waveController)
     self.health = 100
     self.healthbar = Healthbar(self.maxHealth)
     self.healthbar:updateHealthbar(self.health)
-    self.spinAttackMeter = SpinAttackMeter(self)
+    local meterMax = 50
+    if PURCHASED_ITEMS["spinningTop"] then
+        meterMax = 100
+    end
+    self.spinAttackMeter = SpinAttackMeter(self, meterMax)
 
     self.swapPopup = SwapPopup()
 
@@ -88,6 +92,10 @@ function Player:init(x, waveController)
     self:playAnimation()
     self:setCenter(0.5, 1.0)
     self:moveTo(x, GROUND_LEVEL)
+
+    SignalController:subscribe("enemy_damaged", self, function()
+        self:enemyDamaged()
+    end)
 end
 
 function Player:damage(amount)
@@ -322,6 +330,12 @@ function Player:crankIsSpun()
         return self.spinAttackMeter:deplete()
     end
     return false
+end
+
+function Player:enemyDamaged()
+    if self.currentState == "attack1" or self.currentState == "attack2" then
+        self.spinAttackMeter:recharge(10)
+    end
 end
 
 function Player:switchPlayerDirection()
