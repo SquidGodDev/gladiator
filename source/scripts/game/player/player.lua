@@ -333,9 +333,7 @@ function Player:crankIsSpun()
 end
 
 function Player:enemyDamaged()
-    if self.currentState == "attack1" or self.currentState == "attack2" then
-        self.spinAttackMeter:recharge(10)
-    end
+    self.spinAttackMeter:recharge(10)
 end
 
 function Player:switchPlayerDirection()
@@ -365,14 +363,16 @@ function Player:createAttack1Hitbox()
     local xOffset, yOffset = 0, -40
     local width, height = 60, 50
     local delay, time = 4, 6
-    PlayerHitbox(self, xOffset, yOffset, width, height, delay, time, self.attack1Damage)
+    local curHitbox = PlayerHitbox(self, xOffset, yOffset, width, height, delay, time, self.attack1Damage)
+    curHitbox:setRechargesSpin(true)
 end
 
 function Player:createAttack2Hitbox()
     local xOffset, yOffset = -30, -40
     local width, height = 80, 50
     local delay, time = 4, 6
-    PlayerHitbox(self, xOffset, yOffset, width, height, delay, time, self.attack2Damage)
+    local curHitbox = PlayerHitbox(self, xOffset, yOffset, width, height, delay, time, self.attack2Damage)
+    curHitbox:setRechargesSpin(true)
 end
 
 function Player:createSlideAttackHitbox()

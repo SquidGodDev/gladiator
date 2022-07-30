@@ -112,7 +112,7 @@ function BasicEnemy:damage(amount)
             self.attackHitbox:cancel()
             self.attackHitbox = nil
         end
-        return
+        return false
     end
     BasicEnemy.super.damage(self, amount)
     if self.health <= 0 and not self.died then
@@ -128,7 +128,7 @@ function BasicEnemy:damage(amount)
         end
         self.paceTimer:remove()
         self:changeState("death")
-        return
+        return true
     end
 
     if self.hitVelocity ~= 0 then
@@ -161,6 +161,8 @@ function BasicEnemy:damage(amount)
             self.attackHitbox = nil
         end
     end
+
+    return true
 end
 
 function BasicEnemy:applyFriction()

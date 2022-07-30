@@ -34,8 +34,10 @@ function Hitbox:update()
             local collisionID = collisionSprite._sprite
             if not self.collisionDict[collisionID] then
                 self.collisionDict[collisionID] = true
-                collisionSprite:damage(self.damage)
-                self:signalDamage()
+                local isAlive = collisionSprite:damage(self.damage)
+                if isAlive then
+                    self:signalDamage()
+                end
             end
         end
     end

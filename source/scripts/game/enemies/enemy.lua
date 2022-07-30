@@ -16,9 +16,11 @@ function Enemy:init(x, spritesheet)
 end
 
 function Enemy:damage(amount)
+    local enemyAlive = self.health > 0
     self.health -= amount
     self:setImageDrawMode(gfx.kDrawModeFillWhite)
     pd.timer.new(self.hitFlashTime, function()
         self:setImageDrawMode(gfx.kDrawModeCopy)
     end)
+    return enemyAlive
 end
