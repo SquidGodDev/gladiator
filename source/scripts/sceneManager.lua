@@ -24,6 +24,7 @@ end
 
 function SceneManager:loadNewScene()
     gfx.sprite.removeAll()
+    self:removeAllTimers()
     gfx.setDrawOffset(0, 0)
     SignalController:clear()
     self:createTransitionSprite(true)
@@ -65,4 +66,11 @@ function SceneManager:createTransitionSprite(filled)
     self.transitionSprite:moveTo(0, 0)
     self.transitionSprite:setZIndex(10000)
     self.transitionSprite:add()
+end
+
+function SceneManager:removeAllTimers()
+    local allTimers = pd.timer.allTimers()
+    for index, timer in ipairs(allTimers) do
+        timer:remove()
+    end
 end
