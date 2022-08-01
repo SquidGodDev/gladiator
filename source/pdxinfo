@@ -3,5 +3,5 @@ author=SquidGodDev
 description=Fight your way through the colosseum!
 bundleID=com.squidgoddev.gladiator
 version=0.1
-buildnumber=3
+buildnumber=4
 imagePath=images/titleCard
