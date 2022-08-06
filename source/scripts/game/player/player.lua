@@ -96,6 +96,11 @@ function Player:init(x, waveController)
     SignalController:subscribe("enemy_damaged", self, function()
         self:enemyDamaged()
     end)
+
+    self.inputsDisabled = false
+    SignalController:subscribe("level_cleared", self, function()
+        self.inputsDisabled = true
+    end)
 end
 
 function Player:damage(amount)

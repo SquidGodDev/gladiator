@@ -5,6 +5,7 @@ import "scripts/game/enemies/basicEnemies/worm"
 import "scripts/game/enemies/basicEnemies/minotaur"
 import "scripts/game/level/spawnEffect"
 import "scripts/map/mapScene"
+import "scripts/game/results/roomEndDisplay"
 
 local pd <const> = playdate
 local gfx <const> = pd.graphics
@@ -21,10 +22,12 @@ function WaveController:init(enemyList)
             self.spawnedEnemies = 0
             self.totalEnemies = self.totalEnemiesBase + self.wave * self.totalEnemiesBase
 
-            if self.wave >= 3 then
+            if self.wave >= 2 then
                 CUR_LEVEL += 1
                 self:stopSpawning()
-                SceneManager:switchScene(MapScene)
+                SignalController:notify("level_cleared")
+                RoomEndDisplay()
+                -- SceneManager:switchScene(MapScene)
             end
         end
     end)
