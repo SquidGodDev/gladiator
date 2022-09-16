@@ -1,3 +1,7 @@
+-- Here's the player state machine that controls everything about the player. It's gotten quite blocky and bloated
+-- since I've just kept adding to it. I use the animated sprite library to create a state machine to make it more
+-- organized to switch between the possible player states
+
 import "scripts/libraries/AnimatedSprite"
 import "scripts/game/player/playerHitbox"
 import "scripts/game/player/healthbar"
@@ -24,13 +28,19 @@ function Player:init(x, waveController)
 
     self.swapPopup = SwapPopup()
 
+    -- Here I create all the different possible states for the player, and I'm setting which frames
+    -- each state corresponds to on the spritesheet and the speed of the animation, as well as what the
+    -- next state would be when it finishes, if it has a set next state
     local playerSpriteSheet = gfx.imagetable.new("images/player/player-table-112-48")
     Player.super.init(self, playerSpriteSheet)
     self:addState("idle", 1, 10, {tickStep = 4})
     self:addState("run", 11, 20, {tickStep = 4})
 
+    -- For example, when the attack ends, it should immediately go to the actionable idle state
     local attack1EndFrame = 26
     self:addState("attack1", 21, attack1EndFrame, {tickStep = 3, nextAnimation = "idle"})
+    -- I also create autocancel frames, so basically gives you a short window to allow you to more smoothly string
+    -- together attacks, as opposed to having to attack, wait until it goes to the idles state, and then attacking again.
     self.attack1ACFrame = attack1EndFrame - 1
 
     local attack2EndFrame = 33
@@ -53,6 +63,7 @@ function Player:init(x, waveController)
     local spinLeftSwingFrame = spinAttackStartFrame + 1
     local spinRightSwingFrame = spinAttackStartFrame + 3
     self:addState("spinAttack", spinAttackStartFrame, 60, {tickStep = 2})
+    -- I can hook onto the frame changed event to create the spin attack hitboxes
     self.states["spinAttack"].onFrameChangedEvent = function()
         if self:getCurrentFrameIndex() == spinLeftSwingFrame then
             self:createSpinAttackLeftHitbox()
@@ -68,6 +79,7 @@ function Player:init(x, waveController)
         SceneManager:switchScene(MapScene)
     end
 
+    -- Here are the collision rects for the player, just created manually
     self.idleCollisionRect = pd.geometry.rect.new(45, 10, 21, 38)
     self.runCollisionRect = pd.geometry.rect.new(45, 10, 21, 38)
     self.rollCollisionRect = pd.geometry.rect.new(45, 10, 21, 38)
@@ -75,6 +87,7 @@ function Player:init(x, waveController)
     self:setGroups(PLAYER_GROUP)
     self.collisionResponse = gfx.sprite.kCollisionTypeOverlap
 
+    -- The attack damage values
     self.attack1Damage = 5
     self.attack2Damage = 7
     self.slideAttackDamage = 3
@@ -82,6 +95,7 @@ function Player:init(x, waveController)
 
     self.dead = false
 
+    -- Some movement parameters
     self.maxSpeed = 3
     self.velocity = 0
     self.startVelocity = 2
@@ -89,10 +103,14 @@ function Player:init(x, waveController)
     self.friction = 0.3
     self.rollVelocity = 4
     self.slideAttackVelocity = 4
+    -- You have to call :playAnimation() for this library
     self:playAnimation()
     self:setCenter(0.5, 1.0)
     self:moveTo(x, GROUND_LEVEL)
 
+    -- I want to know when an enemy gets damaged so that I can recharge the spin bar. This way, I can subscribe to this "enemy_damaged" \
+    -- event and I can send out a signal if the enemy is damaged to get notified about it. I send out this signal in the playerHitbox file.
+    -- I could technically get a reference to the hitbox when I create it, but this is the easier/lazier way to get a reference
     SignalController:subscribe("enemy_damaged", self, function()
         self:enemyDamaged()
     end)
@@ -119,6 +137,8 @@ function Player:update()
     if pd.buttonJustPressed(pd.kButtonUp) then
         self.swapPopup:setVisible(not self.swapPopup:isVisible())
     end
+    -- You can see here that I take a bunch of inputs in the idle state and switch to different states based on the
+    -- input pressed
     if self.currentState == "idle" then
         self:setCollideRect(self.idleCollisionRect)
         self:applyFriction()
@@ -137,6 +157,12 @@ function Player:update()
         elseif self:crankIsSpun() then
             self:changeState("spinAttack")
         end
+    -- You can see I still take inputs here, because I want the player to be able
+    -- to immediately cancel their run into an attack. As the player keeps pressing
+    -- a direction button, I keep increasing their velocity. However, you might notice
+    -- that there is not returning to the idle state here. That's because there is first
+    -- a slide state that adds friction to the player, and when the player velocity hits
+    -- 0, that's when you return back to idle
     elseif self.currentState == "run" then
         self:setCollideRect(self.runCollisionRect)
         if pd.buttonIsPressed(pd.kButtonA) then
@@ -166,6 +192,9 @@ function Player:update()
         else
             self:changeState("slide")
         end
+    -- You can see that I check against the autocancel frame to see if the player can make an input.
+    -- Otherwise, you can input anything. The attack hitbox isn't created in the state, but rather
+    -- when we switch to the state
     elseif self.currentState == "attack1" then
         self:applyFriction()
         if self:getCurrentFrameIndex() >= self.attack1ACFrame then
@@ -194,6 +223,13 @@ function Player:update()
                 self:activateSwapAbility()
             end
         end
+    -- There is nothing special to the roll movement, it's really just that I set the
+    -- velocity to a higher value than the run velocity, and since at the end of the
+    -- update loop I move the player based on the velocity, the player moves in the
+    -- roll directions. I also check the i-frames. Basically, I wanted the player to have
+    -- invicibility only in the middle of the roll, so I switch out the collision rect
+    -- based on what part of the roll you're in. When invicibile, I just get rid of the
+    -- collision rect
     elseif self.currentState == "roll" then
         local curFrameIndex = self:getCurrentFrameIndex()
         if curFrameIndex <= self.rollIFrameStart then
@@ -208,6 +244,7 @@ function Player:update()
         else
             self.velocity = self.rollVelocity
         end
+    -- This is the little slide slowdown that the player does when they stop running
     elseif self.currentState == "slide" then
         self:setCollideRect(self.idleCollisionRect)
         self:applyFriction()
@@ -223,6 +260,7 @@ function Player:update()
         elseif pd.buttonIsPressed(pd.kButtonDown) then
             self:activateSwapAbility()
         end
+    -- The slide attack is pretty similar to the roll, but with no invicibility and a hitbox
     elseif self.currentState == "slideAttack" then
         self:setCollideRect(self.slideAttackCollisionRect)
         if self.globalFlip == 1 then
@@ -364,6 +402,7 @@ function Player:switchToSlideAttack()
     self:createSlideAttackHitbox()
 end
 
+-- Manually creating all the hitbox sizes
 function Player:createAttack1Hitbox()
     local xOffset, yOffset = 0, -40
     local width, height = 60, 50

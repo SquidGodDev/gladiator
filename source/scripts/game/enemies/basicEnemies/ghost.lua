@@ -1,3 +1,6 @@
+-- I'll use the ghost as an example of how I extend the basicEnemy class. As you can see, you
+-- need to initialize a lot of things, but it's pretty straightforward.
+
 import "scripts/game/enemies/basicEnemies/basicEnemy"
 import "scripts/game/enemies/enemyHitbox"
 
@@ -10,11 +13,16 @@ function Ghost:init(x)
     local ghostSpriteSheet = gfx.imagetable.new("images/enemies/ghost/ghost-table-32-32")
     Ghost.super.init(self, x, ghostSpriteSheet)
 
+    -- Initializing the health
     self.health = 40
 
+    -- Here, I create the states
+    -- that match the ghosts animation spritesheet, since each enemy has different animations that take
+    -- a different amount of time.
     self:addState("idle", 1, 12, {tickStep = 4})
     self:addState("run", 13, 18, {tickStep = 4})
     self:addState("attack", 26, 31, {tickStep = 3, nextAnimation = "idle"})
+    -- An attack is not explicity defined in the basicEnemy class, so we create the attack hitbox here
     self.states["attack"].onStateChangedEvent = function()
         self:createAttackHitbox()
     end
@@ -24,10 +32,12 @@ function Ghost:init(x)
         self:remove()
     end
 
+    -- These are the hitboxes for the enemy, which gets used in basicEnemy
     self.idleCollisionRect = pd.geometry.rect.new(4, 4, 25, 28)
     self.runCollisionRect = pd.geometry.rect.new(4, 4, 25, 28)
     self.attackCollisionRect = pd.geometry.rect.new(4, 4, 25, 28)
 
+    -- Setting a bunch of adjustable parameters on the enemy
     self.attackDamage = 3
 
     self.maxSpeed = 2
@@ -49,6 +59,7 @@ function Ghost:init(x)
     self:playAnimation()
 end
 
+-- Using the hitbox class I've created, I can make custom sized hitboxes
 function Ghost:createAttackHitbox()
     local xOffset, yOffset = -15, -30
     local width, height = 23, 30

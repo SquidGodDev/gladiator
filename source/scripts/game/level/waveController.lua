@@ -1,3 +1,5 @@
+-- This is the wave controller that handles spawning the enemies and drawing the progress bar
+
 import "scripts/game/enemies/basicEnemies/wolf"
 import "scripts/game/enemies/basicEnemies/rat"
 import "scripts/game/enemies/basicEnemies/ghost"
@@ -13,6 +15,8 @@ local gfx <const> = pd.graphics
 class('WaveController').extends(gfx.sprite)
 
 function WaveController:init(enemyList)
+    -- We don't have a direct reference to the enemies, so in order to know how many enemies have died and
+    -- when we can end the level, I use the signal library to get notified about that event
     SignalController:subscribe("enemy_died", self, function()
         self.currentEnemies -= 1
         self.enemiesKilled += 1
@@ -44,6 +48,7 @@ function WaveController:init(enemyList)
     self.waveMultiplier = 3
     self.totalEnemies = self.totalEnemiesBase + self.wave * self.totalEnemiesBase
 
+    -- Simple timer to spawn the enemies. I make sure that there's only a max number of enemies to not overwhelm the player
     self.spawnTimer = pd.timer.new(1000, function()
         if self.currentEnemies < self.maxEnemies + self.wave and self.spawnedEnemies < self.totalEnemies then
             self.currentEnemies += 1

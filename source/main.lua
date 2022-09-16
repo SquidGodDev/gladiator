@@ -1,3 +1,22 @@
+--[[
+Hey Giant Squid patrons! I'm stopped work on Gladiator, but I thought it would be good to go back through the project and add some comments
+since there's some good stuff in here.
+
+Below is the overarching file structure for the project. In each main folder, I expound more on the sub-folders and files in
+the scene files.
+
+scripts/
+    game/
+        gameScene.lua the main scene that handles the main game/combat
+    libraries/
+        AnimatedSprite.lua - A library from Whitebrim that allows you to create animated state machines
+        Signal.lua - A library from Dustin Mierau that allows you to subscribe to and send signals around the project, so you don't
+                     need a direct reference to something. Quite useful - it's like having signals from Godot
+    map/
+        mapScene.lua - Handles the level map 
+    title/
+        This is empty
+]]--
 
 import "CoreLibs/object"
 import "CoreLibs/graphics"

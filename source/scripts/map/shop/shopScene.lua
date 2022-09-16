@@ -1,3 +1,5 @@
+-- There's not much to this, just another gridview basically
+
 import "scripts/map/mapScene"
 
 local pd <const> = playdate

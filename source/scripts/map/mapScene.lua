@@ -1,3 +1,5 @@
+-- This is a pretty long file, but really it's just a bunch of UI work
+
 import "scripts/game/player/player"
 import "scripts/game/level/waveController"
 

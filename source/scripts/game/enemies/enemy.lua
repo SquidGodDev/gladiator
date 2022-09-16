@@ -1,3 +1,7 @@
+-- This is a very generic parent class that is meant to be extended for every enemy in the game. It implements
+-- the most basic components that every enemy would have, which is a state machine, the correct collision groups,
+-- and taking damage and flashing when being damaged. This gets extended by basicEnemy.lua
+
 import "scripts/libraries/AnimatedSprite"
 
 local pd <const> = playdate

@@ -1,3 +1,29 @@
+-- This is the scene that handles the main game/combat. This file itself doesn't have much, but it does have a lot of
+-- sub elements that do a lot. Here's the file structure.
+
+--[[
+    enemies/
+        basicEnemies/
+            basicEnemy.lua - A generic enemy with AI that wanders around, and runs and attacks the player when near. I extend
+                             this to create all the different enemy types
+        enemy.lua - A very simple enemy parent class that just handles setting the correct group and taking damage
+        enemyHitbox.lua - Extends the hitbox class and creates an enemy hitbox with the correct collision groups
+    level/
+        spawnEffect.lua - Handles drawing the pillar animation that appears when an enemy spawns
+        waveController.lua - Handles the wave spawning system that spawns in enemies
+    player/
+        healthbar.lua - Handles drawing the healthbar
+        player.lua - Handles the entire player movement, attacking, and state machine
+        playerHitbox.lua - Extends the hitbox class and creates a player hitbox with the correct collision groups
+        spinAttackMeter.lua - Handles drawing and keeping track of the spin attack meter
+        swapPopup.lua - Handles drawing and keeping track of the swap abilities
+    results/
+        resultsScene.lua - A temporary scene that shows how well you did with the infinite waves I added one of the weeks
+        roomEndDisplay.lua - A popup that shows you how much gold you've earned
+    gameScene.lua - This file
+    hitbox.lua - A helper class that generates a hitbox
+]]
+
 import "scripts/game/player/player"
 import "scripts/game/level/waveController"
 

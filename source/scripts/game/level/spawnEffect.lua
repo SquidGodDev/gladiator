@@ -1,3 +1,6 @@
+-- This is just a simple helper class that creates the spawn pillar. You can see that I pass in an enemy constructor,
+-- so the pillar can spawn the enemy itself when the animation has finished
+
 local pd <const> = playdate
 local gfx <const> = pd.graphics
 

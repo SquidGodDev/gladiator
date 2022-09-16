@@ -1,3 +1,10 @@
+-- This is a state machine that handles a very basic enemy AI. basically, the enemy has different states. Usually,
+-- the player is in a wandering state and switches between being idle and running around. However, if the player is
+-- in range, the enemy will run after the player and then, when close enough, it will attack the player. You can extend
+-- this clas and change properties like health, speed, the detection range, whether or not the enemy gets stunned on hit,
+-- what happens when the enemy attacks, the hitboxes, and attack speed to create a bunch of different enemies that seem
+-- very different, but are really just simple permutations of this base class. 
+
 import "scripts/game/enemies/enemy"
 
 local pd <const> = playdate
@@ -39,6 +46,7 @@ function Enemy:update()
         return
     end
 
+    -- Changing between a player detected state based on if the player is nearby
     if not self.died then
         if not self.playerInRange and (math.abs(PLAYER_X - self.x) <= self.detectRange) then
             self.playerInRange = true
@@ -60,6 +68,9 @@ function Enemy:update()
             end
         end
     elseif self.currentState == "run" then
+        -- A pretty simple run state, when I increase a velocity property with acceleration up
+        -- to a max speed. At the end of the update loop, you'll see that I move the enemy based
+        -- on this velocity property
         self:setCollideRect(self.runCollisionRect)
         if self.playerInRange and not self.died then
             self.movingRight = self.x <= PLAYER_X
@@ -79,6 +90,7 @@ function Enemy:update()
             end
         end
     elseif self.currentState == "attack" then
+        -- Attacks on a cooldown based on self.attackCooldown
         self:applyFriction()
         if not self.attackCooldownTimer then
             self.attackCooldownTimer = pd.timer.new(self.attackCooldown, function()
@@ -116,6 +128,10 @@ function BasicEnemy:damage(amount)
     end
     BasicEnemy.super.damage(self, amount)
     if self.health <= 0 and not self.died then
+        -- The signal is meant to notify the wave controller how many enemies have been killed, so
+        -- that it knows when to end the level. I use this since the wave controller has no direct connection
+        -- with the enemy, so this way we can somehow communicate with the wave controller, despite being far away
+        -- code-wise
         SignalController:notify("enemy_died")
         self.died = true
         if self.attackCooldownTimer then
